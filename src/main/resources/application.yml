@@ -1,5 +1,0 @@
-  spring:
-    profiles.active: qa
-
-  server.port: 8081
-  server.servlet.context-path: /sistema-vendas
