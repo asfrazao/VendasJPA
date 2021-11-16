@@ -14,27 +14,56 @@ import java.util.List;
 @Repository
 public class Clientes {
 
-    private static final String SELECT_ALL= " select * from CLIENTE";
+    private static String SELECT_ALL = " select * from CLIENTE";
     private static String INSERT = "insert into cliente (nome) values (?)";
+    private static String UPDATE = "update cliente set nome = ? where id = ?";
+    private static String DELETE = "delete from cliente where id = ?";
+
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public Cliente salvar(Cliente cliente){
+    public Cliente salvar(Cliente cliente) {
         jdbcTemplate.update(INSERT, new Object[]{cliente.getNome()});
-                return cliente;
+        return cliente;
     }
 
-    public List<Cliente> obterTodos(){
-        return jdbcTemplate.query(SELECT_ALL, new RowMapper<Cliente>(){
+    public Cliente atualizar(Cliente cliente) {
+        jdbcTemplate.update(UPDATE, new Object[]{
+                cliente.getNome(),
+                cliente.getId()});
+        return cliente;
+    }
+
+    public Cliente deletar(Cliente cliente){
+        jdbcTemplate.update(DELETE,new Object[]{
+                cliente.getId()});
+        return cliente;
+    }
+
+    public List<Cliente> buscaPorNome (String nome){
+        return jdbcTemplate.query(SELECT_ALL.concat(" where nome like ?"),
+                new Object[]{"%" + nome + "%"},
+                obterClienteMapper());
+    }
+
+
+
+    public List<Cliente> obterTodos() {
+        return jdbcTemplate.query(SELECT_ALL, obterClienteMapper());
+    }
+
+    private RowMapper<Cliente> obterClienteMapper() {
+        return new RowMapper<Cliente>() {
 
             @Override
             public Cliente mapRow(ResultSet resultSets, int rowNum) throws SQLException {
-                Integer id =resultSets.getInt("id");
+                Integer id = resultSets.getInt("id");
                 String nome = resultSets.getString("nome");
                 return new Cliente(id, nome);
             }
-        });
+        };
     }
 
 }
