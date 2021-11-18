@@ -5,9 +5,7 @@ import io.github.asfrazao.domain.repository.Clientes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
@@ -19,27 +17,27 @@ public class VendasApplication {
     @Bean
     public CommandLineRunner init(@Autowired Clientes clientes){
         return args -> {
-            clientes.salvar(new Cliente("Alessandro"));
-            clientes.salvar(new Cliente("Fabiana"));
-            clientes.salvar(new Cliente("Ze Ruela"));
+            clientes.save(new Cliente("Alessandro"));
+            clientes.save(new Cliente("Fabiana"));
+            clientes.save(new Cliente("Ze Ruela"));
 
-            List<Cliente> todosClientes = clientes.obterTodos();
+            List<Cliente> todosClientes = clientes.findAll();
             todosClientes.forEach(System.out::println);
 
             todosClientes.forEach(c -> {
                 c.setNome(c.getNome() + " atualizado!!");
-                clientes.atualizar(c);
+                clientes.save(c);
             });
 
             System.out.println("****Buscando Clientes******");
-            clientes.buscaPorNome("Ale").forEach(System.out::println);
+            clientes.findByNomeLike("Ale").forEach(System.out::println);
 
             System.out.println("****Deletando Clientes*****");
-            clientes.obterTodos().forEach(c -> {
-                clientes.deletar(c);
+            clientes.findAll().forEach(c -> {
+                clientes.delete(c);
             });
 
-            todosClientes = clientes.obterTodos();
+            todosClientes = clientes.findAll();
 
             if(todosClientes.isEmpty()){
                 System.out.println("sem clientes para exibir");
